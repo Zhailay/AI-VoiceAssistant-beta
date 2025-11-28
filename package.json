@@ -1,0 +1,22 @@
+{
+  "name": "voice-assistant-nodejs",
+  "version": "1.0.0",
+  "description": "Voice AI Assistant on Node.js + Express + Twig",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["voice", "ai", "assistant", "ollama", "speech-recognition"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "twig": "^1.17.1",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

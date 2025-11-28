@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <main class="container">
+        <div class="content">
+            <h1 class="title">{{ title }}</h1>
+
+            <div class="canvas-container" id="circleContainer">
+                <canvas id="canvas" width="400" height="400" class="canvas"></canvas>
+                <div class="state-label" id="stateLabel">Готов</div>
+            </div>
+
+            <div class="info">
+                <div class="info-box" id="transcriptBox" style="display: none;">
+                    <strong>Вы сказали:</strong>
+                    <p id="transcript"></p>
+                </div>
+
+                <div class="info-box" id="responseBox" style="display: none;">
+                    <strong>Ответ ассистента:</strong>
+                    <p id="response"></p>
+                </div>
+            </div>
+
+            <div class="instructions">
+                <p>Нажмите на круг и начните говорить. Распознавание остановится автоматически после паузы.</p>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.7;">
+                    Работает на Chrome, Edge, Safari. Требуется Ollama для генерации ответов.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
