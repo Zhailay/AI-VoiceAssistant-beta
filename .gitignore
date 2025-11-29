@@ -3,6 +3,7 @@ node_modules/
 
 # Environment
 .env
+./ssl
 .env.local
 
 # Logs

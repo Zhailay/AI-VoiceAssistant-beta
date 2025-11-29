@@ -9,6 +9,7 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3004;
 const HTTPS_PORT = process.env.HTTPS_PORT || 3005;
+const audioPath = path.join("C:/PetPjjrojects/asiAssistant/shared_audio");
 
 // Настройка Twig
 app.set('view engine', 'twig');
@@ -17,12 +18,14 @@ app.set('views', path.join(__dirname, 'views'));
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use("/audio", express.static(audioPath));
+
 
 // SSL сертификаты
 const credentials = {
-  key: fs.readFileSync("D:/ssl/example.key", 'utf8'),
-  cert: fs.readFileSync('D:/ssl/example.crt', 'utf8'),
-  ca: fs.readFileSync('D:/ssl/example.ca-bundle', 'utf8')
+  key: fs.readFileSync("./ssl/zhetysu.edu.kz-private.key", 'utf8'),
+  cert: fs.readFileSync('./ssl/_zhetysu_edu_kz.crt', 'utf8'),
+  ca: fs.readFileSync('./ssl/_zhetysu_edu_kz.ca-bundle', 'utf8')
 };
 
 // Главная страница
@@ -50,9 +53,9 @@ app.post('/api/llm', async (req, res) => {
     // Формируем промпт
     const prompt = `Ты голосовой ассистент. Отвечай кратко и по существу на русском языке.
 
-Вопрос пользователя: ${text}
+  Вопрос пользователя: ${text}
 
-Твой ответ:`;
+  Твой ответ:`;
 
     console.log('🤖 Отправляем в Ollama...');
 
@@ -91,6 +94,32 @@ app.post('/api/llm', async (req, res) => {
   }
 });
 
+// API TTS через Silero Python
+app.post('/api/tts', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text) return res.status(400).json({ error: 'Текст не предоставлен' });
+
+    console.log('🔊 TTS запрос:', text.substring(0, 50) + '...');
+
+    // Отправляем запрос к Python Silero API
+    const response = await axios.post('http://127.0.0.1:8000/synthesize/', {
+      text: text
+    });
+
+    const { file_id } = response.data; // Python возвращает file_id
+
+    console.log('✅ Аудио сгенерировано:', file_id);
+
+    // Возвращаем только имя файла (файл будет доступен через /audio/)
+    res.json({ file: `${file_id}.wav` });
+  } catch (err) {
+    console.error('❌ TTS ошибка:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // Создаем HTTPS сервер
 const httpsServer = https.createServer(credentials, app);
 
@@ -107,7 +136,7 @@ httpsServer.listen(HTTPS_PORT, () => {
 // Опционально: HTTP сервер для редиректа на HTTPS
 const http = require('http');
 http.createServer((req, res) => {
-  res.writeHead(301, { "Location": `https://${req.headers.host.split(':')[0]}:${HTTPS_PORT}${req.url}` });
+  // res.writeHead(301, { "Location": `https://${req.headers.host.split(':')[0]}:${HTTPS_PORT}${req.url}` });
   res.end();
 }).listen(PORT, () => {
   console.log(`📍 HTTP редирект с :${PORT} на HTTPS :${HTTPS_PORT}`);

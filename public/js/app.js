@@ -177,30 +177,72 @@ function updateAudioLevel() {
 }
 
 // Text-to-Speech
-function speakText(text) {
-  if (!('speechSynthesis' in window)) {
-    console.error('Speech Synthesis не поддерживается');
-    setState('idle');
-    return;
-  }
+// function speakText(text) {
+//   if (!('speechSynthesis' in window)) {
+//     console.error('Speech Synthesis не поддерживается');
+//     setState('idle');
+//     return;
+//   }
 
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'ru-RU';
+//   const utterance = new SpeechSynthesisUtterance(text);
+//   utterance.lang = 'ru-RU';
 
-  utterance.onstart = () => {
+//   utterance.onstart = () => {
+//     setState('speaking');
+//   };
+
+//   utterance.onend = () => {
+//     setState('idle');
+//   };
+
+//   utterance.onerror = () => {
+//     setState('idle');
+//   };
+
+//   window.speechSynthesis.speak(utterance);
+// }
+
+
+async function speakText(text) {
+  try {
+    console.log('🔊 Отправка на озвучку:', text.substring(0, 50) + '...');
+
+    const response = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Получен аудио файл:', data.file);
+
+    const audio = new Audio(`/audio/${data.file}`);
+
     setState('speaking');
-  };
 
-  utterance.onend = () => {
+    audio.onended = () => {
+      console.log('✅ Воспроизведение завершено');
+      setState('idle');
+    };
+
+    audio.onerror = (err) => {
+      console.error('❌ Ошибка воспроизведения аудио:', err);
+      setState('idle');
+    };
+
+    await audio.play();
+
+  } catch (err) {
+    console.error('❌ Ошибка TTS:', err);
+    alert('Ошибка генерации речи. Проверьте, что Python API запущен на порту 8000.');
     setState('idle');
-  };
-
-  utterance.onerror = () => {
-    setState('idle');
-  };
-
-  window.speechSynthesis.speak(utterance);
+  }
 }
+
 
 // Установить состояние
 function setState(newState) {
