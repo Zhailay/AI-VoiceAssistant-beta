@@ -20,9 +20,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // SSL сертификаты
 const credentials = {
-  key: fs.readFileSync("D:/ssl/zhetysu.edu.kz-private.key", 'utf8'),
-  cert: fs.readFileSync('D:/ssl/_zhetysu_edu_kz.crt', 'utf8'),
-  ca: fs.readFileSync('D:/ssl/_zhetysu_edu_kz.ca-bundle', 'utf8')
+  key: fs.readFileSync("D:/ssl/example.key", 'utf8'),
+  cert: fs.readFileSync('D:/ssl/example.crt', 'utf8'),
+  ca: fs.readFileSync('D:/ssl/example.ca-bundle', 'utf8')
 };
 
 // Главная страница
